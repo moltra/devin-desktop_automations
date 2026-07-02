@@ -134,4 +134,4 @@ When adding new agents or skills:
 
 ## License
 
-This configuration is provided as-is for use with Devin AI.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
