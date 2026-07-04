@@ -47,19 +47,32 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 │   ├── git-workflow-template.md
 │   └── etc.
 ├── patterns/                  # Generic patterns and workflows
-│   ├── coordinator-workflows.md
+│   ├── coordinator-optimization-patterns.md
+│   ├── coordinator-quick-reference.md
+│   ├── task-template-patterns.md
+│   ├── task-templates-quick-reference.md
+│   ├── skills-integration-patterns.md
+│   ├── skills-quick-reference.md
+│   ├── delegation-patterns.md
 │   ├── streamlit-performance.md
-│   ├── redis-patterns.md
-│   └── delegation-patterns.md
+│   └── redis-patterns.md
+├── .agents/                   # Devin skills (tool-agnostic standard)
+│   └── skills/
+│       ├── coordinator/
+│       ├── python-reviewer/
+│       ├── security-auditor/
+│       ├── redis-engineer/
+│       ├── testing-guardian/
+│       ├── streamlit-expert/
+│       ├── git-workflow/
+│       ├── ollama-testing/
+│       ├── quick-review/
+│       └── redis-resilience/
 ├── documentation/             # Documentation
 │   ├── agent-architecture.md
 │   ├── CRITICAL_LESSONS.md
 │   ├── DEVELOPMENT_GUIDE.md
 │   └── CREATING_AGENTS.md
-├── skills/                    # Reusable skill configurations
-│   ├── ollama-testing/
-│   ├── quick-review/
-│   └── redis-resilience/
 ├── scripts/                   # Utility scripts
 │   ├── install-agents.sh
 │   └── validate-agent.sh
@@ -98,12 +111,14 @@ If you prefer manual installation:
 # Copy agent templates
 cp -r templates/* ~/.config/devin/agents/
 
-# Copy skills
-cp -r skills/* ~/.config/devin/skills/
+# Copy skills (using .agents standard for broad compatibility)
+cp -r .agents/skills/* ~/.config/devin/skills/
 
 # Make scripts executable
 chmod +x scripts/*.sh
 ```
+
+**Note:** Skills are stored in `.agents/skills/` following the `.agents` skills standard for broad compatibility with third-party tools.
 
 ## Customization
 
@@ -164,8 +179,15 @@ coordinator → subagent_explore → domain-specialist → python-reviewer → c
 ## Documentation
 
 - [CUSTOMIZATION.md](CUSTOMIZATION.md): How to customize templates for your project
-- [patterns/coordinator-workflows.md](patterns/coordinator-workflows.md): Coordinator delegation patterns
+- [patterns/coordinator-optimization-patterns.md](patterns/coordinator-optimization-patterns.md): Coordinator behavioral patterns for efficiency
+- [patterns/coordinator-quick-reference.md](patterns/coordinator-quick-reference.md): Quick reference for coordinator behavior
+- [patterns/task-template-patterns.md](patterns/task-template-patterns.md): Task construction templates
+- [patterns/task-templates-quick-reference.md](patterns/task-templates-quick-reference.md): Quick reference for task templates
+- [patterns/skills-integration-patterns.md](patterns/skills-integration-patterns.md): Skills integration guide
+- [patterns/skills-quick-reference.md](patterns/skills-quick-reference.md): Quick reference for available skills
+- [patterns/delegation-patterns.md](patterns/delegation-patterns.md): Structural delegation patterns
 - [patterns/streamlit-performance.md](patterns/streamlit-performance.md): Streamlit optimization patterns
+- [patterns/redis-patterns.md](patterns/redis-patterns.md): Redis integration patterns
 - [documentation/agent-architecture.md](documentation/agent-architecture.md): Detailed architecture documentation
 - [documentation/CRITICAL_LESSONS.md](documentation/CRITICAL_LESSONS.md): Important lessons learned
 - [documentation/DEVELOPMENT_GUIDE.md](documentation/DEVELOPMENT_GUIDE.md): Development guidelines

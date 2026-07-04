@@ -63,7 +63,14 @@
       "Write(~/.config/devin/agents/security-auditor)",
       "Write(~/.config/devin/scripts)",
       "Write(~/.config/devin/skills/redis-resilience)",
-      "Write(~/.config/devin/skills/ollama-testing)"
+      "Write(~/.config/devin/skills/ollama-testing)",
+      "Write(~/.config/devin/skills/coordinator)",
+      "Write(~/.config/devin/skills/python-reviewer)",
+      "Write(~/.config/devin/skills/security-auditor)",
+      "Write(~/.config/devin/skills/redis-engineer)",
+      "Write(~/.config/devin/skills/testing-guardian)",
+      "Write(~/.config/devin/skills/streamlit-expert)",
+      "Write(~/.config/devin/skills/git-workflow)"
     ]
   }
 }

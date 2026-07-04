@@ -19,9 +19,15 @@ mkdir -p "$DEVIN_CONFIG/skills"
 echo "Copying agent templates..."
 cp -r "$REPO_DIR/templates/"* "$DEVIN_CONFIG/agents/"
 
-# Copy skills
+# Copy skills (from .agents/skills/ following .agents standard)
 echo "Copying skills..."
-cp -r "$REPO_DIR/skills/"* "$DEVIN_CONFIG/skills/"
+cp -r "$REPO_DIR/.agents/skills/"* "$DEVIN_CONFIG/skills/"
+
+# Also copy legacy skills from skills/ directory if it exists
+if [ -d "$REPO_DIR/skills" ]; then
+    echo "Copying legacy skills..."
+    cp -r "$REPO_DIR/skills/"* "$DEVIN_CONFIG/skills/"
+fi
 
 # Make scripts executable
 echo "Making scripts executable..."
