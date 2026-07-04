@@ -1,85 +1,145 @@
-# Devin Desktop Automations
+# Devin Desktop Automations - Agent Templates
 
-A comprehensive multi-agent system configuration for Devin AI, featuring specialized sub-agents for various development domains.
+A comprehensive collection of **generic agent templates and patterns** for Devin AI multi-agent systems. These templates provide a foundation for building specialized sub-agents while keeping project-specific knowledge private.
 
 ## Overview
 
-This repository contains the configuration and architecture for a Devin multi-agent system designed to automate and streamline development workflows. The system uses a hierarchical delegation pattern where a coordinator agent orchestrates specialized sub-agents for specific tasks.
+This repository contains **generic agent templates, patterns, and documentation** that can be customized for any project. The templates are designed to be copied to your local Devin configuration and then adapted to your specific needs.
 
 ## Architecture
 
-The system consists of 11 specialized agents organized into functional groups:
+The system uses a hierarchical delegation pattern where a coordinator agent orchestrates specialized sub-agents for specific tasks.
 
-### Coordinator
-- **coordinator**: Main orchestrator using glm-5-2-high model for task delegation and synthesis
+### Available Templates
 
-### Code & Development
-- **python-reviewer**: Code quality and review specialist
-- **api-specialist**: API design and implementation
-- **testing-guardian**: Test quality and validation
+#### Coordinator
+- **coordinator-template**: Main orchestrator for task delegation and synthesis
 
-### Infrastructure
-- **streamlit-expert**: UI architecture and Streamlit applications
-- **redis-engineer**: Caching strategies and Redis integration
-- **ollama-specialist**: LLM integration and Ollama management
-- **devops-docker**: Container orchestration and deployment
+#### Code & Development
+- **python-reviewer-template**: Code quality and review specialist
+- **api-specialist-template**: API design and implementation
+- **testing-guardian-template**: Test quality and validation
 
-### Security & Quality
-- **security-auditor**: Security scanning and vulnerability assessment
-- **video-pipeline-reviewer**: Video processing pipeline optimization
+#### Infrastructure
+- **streamlit-expert-template**: UI architecture and Streamlit applications
+- **redis-engineer-template**: Caching strategies and Redis integration
+- **ollama-specialist-template**: LLM integration and Ollama management
+- **devops-docker-template**: Container orchestration and deployment
 
-### Git Operations
-- **git-workflow**: Branch management and commit workflows
+#### Security & Quality
+- **security-auditor-template**: Security scanning and vulnerability assessment
+- **video-pipeline-reviewer-template**: Video processing pipeline optimization
+
+#### Git Operations
+- **git-workflow-template**: Branch management and commit workflows
 
 ## Repository Structure
 
 ```
 .
-├── agents/                 # Agent configurations
-│   ├── api-specialist/
-│   ├── coordinator/
-│   ├── devops-docker/
-│   ├── git-workflow/
-│   ├── ollama-specialist/
-│   ├── python-reviewer/
-│   ├── redis-engineer/
-│   ├── security-auditor/
-│   ├── streamlit-expert/
-│   ├── testing-guardian/
-│   └── video-pipeline-reviewer/
-├── skills/                 # Reusable skill configurations
+├── templates/                 # Generic agent templates
+│   ├── coordinator-template.md
+│   ├── python-reviewer-template.md
+│   ├── streamlit-expert-template.md
+│   ├── redis-engineer-template.md
+│   ├── ollama-specialist-template.md
+│   ├── security-auditor-template.md
+│   ├── git-workflow-template.md
+│   └── etc.
+├── patterns/                  # Generic patterns and workflows
+│   ├── coordinator-workflows.md
+│   ├── streamlit-performance.md
+│   ├── redis-patterns.md
+│   └── delegation-patterns.md
+├── documentation/             # Documentation
+│   ├── agent-architecture.md
+│   ├── CRITICAL_LESSONS.md
+│   ├── DEVELOPMENT_GUIDE.md
+│   └── CREATING_AGENTS.md
+├── skills/                    # Reusable skill configurations
 │   ├── ollama-testing/
 │   ├── quick-review/
 │   └── redis-resilience/
-├── scripts/                # Utility scripts
-│   ├── review_code.py
-│   └── pre-commit-config.template.yaml
-├── cli/                    # CLI tools (empty)
-├── hooks/                  # Git hooks (empty)
-├── config.json             # Main Devin configuration
-├── agent-architecture.md   # Architecture documentation
-├── CRITICAL_LESSONS.md     # Important lessons learned
-└── DEVELOPMENT_GUIDE.md    # Development guidelines
+├── scripts/                   # Utility scripts
+│   ├── install-agents.sh
+│   └── validate-agent.sh
+├── CUSTOMIZATION.md           # How to customize templates
+└── README.md                 # This file
 ```
 
-## Configuration
+## Installation
 
-The main configuration is in `config.json` and includes:
+### Quick Start
 
-- **MCP Servers**: GitHub, Git, Filesystem, Memory, DeepWiki, Playwright, Redis
-- **Permissions**: Fine-grained access control for different tools and paths
-- **Agent Profiles**: Model assignments and tool permissions for each agent
+1. **Clone this repository:**
+   ```bash
+   git clone https://github.com/moltra/devin-desktop_automations.git
+   cd devin-desktop_automations
+   ```
+
+2. **Install templates to your local Devin config:**
+   ```bash
+   bash scripts/install-agents.sh
+   ```
+
+3. **Customize for your project:**
+   - Edit agent configurations in `~/.config/devin/agents/`
+   - Add project-specific patterns and knowledge
+   - Adjust permissions and tool access
+   - Update model assignments if needed
+
+4. **Restart Devin** to load the new configurations
+
+### Manual Installation
+
+If you prefer manual installation:
+
+```bash
+# Copy agent templates
+cp -r templates/* ~/.config/devin/agents/
+
+# Copy skills
+cp -r skills/* ~/.config/devin/skills/
+
+# Make scripts executable
+chmod +x scripts/*.sh
+```
+
+## Customization
+
+### Project-Specific Customization
+
+After installing the templates, you should customize them for your project:
+
+1. **Add Project Knowledge:**
+   - Add project-specific file paths
+   - Include business logic patterns
+   - Document internal architecture
+   - Add configuration details
+
+2. **Adjust Permissions:**
+   - Add project-specific tool permissions
+   - Configure file access patterns
+   - Set up Docker/container permissions
+   - Configure API access
+
+3. **Update Models:**
+   - Choose appropriate models for your use case
+   - Adjust model parameters
+   - Configure model-specific behaviors
+
+See [CUSTOMIZATION.md](CUSTOMIZATION.md) for detailed customization guidelines.
 
 ## Workflow Patterns
 
-### API Development
+### Standard Development Workflow
 ```
-coordinator → api-specialist → python-reviewer → testing-guardian → security-auditor → coordinator
+coordinator → domain-specialist → python-reviewer → testing-guardian → security-auditor → coordinator
 ```
 
-### Streamlit App Development
+### API Development
 ```
-coordinator → streamlit-expert → python-reviewer → testing-guardian → security-auditor → coordinator
+coordinator → api-specialist → python-reviewer → testing-guardian → security-auditor → git-workflow
 ```
 
 ### Infrastructure Setup
@@ -87,15 +147,10 @@ coordinator → streamlit-expert → python-reviewer → testing-guardian → se
 coordinator → devops-docker → security-auditor → coordinator
 ```
 
-### Git Workflow
+### Performance Investigation
 ```
-coordinator → git-workflow → python-reviewer → security-auditor → git-workflow → coordinator
+coordinator → subagent_explore → domain-specialist → python-reviewer → coordinator
 ```
-
-## Model Selection
-
-- **glm-5-2-high**: Used for complex tasks requiring high capability (coordinator, code review, security, video)
-- **kimi-k2-7**: Used for focused, efficient task execution (infrastructure, testing, git)
 
 ## Key Design Principles
 
@@ -104,34 +159,54 @@ coordinator → git-workflow → python-reviewer → security-auditor → git-wo
 3. **Parallel Execution**: Independent subtasks run concurrently when possible
 4. **Cross-Validation**: Code reviewed by multiple specialists
 5. **Safe Operations**: Git and destructive operations have limited permissions
-
-## Setup
-
-1. Clone this repository
-2. Copy agent configurations to your Devin config directory:
-   ```bash
-   cp -r agents/* ~/.config/devin/agents/
-   cp -r skills/* ~/.config/devin/skills/
-   cp config.json ~/.config/devin/
-   ```
-3. Adjust paths and permissions in `config.json` as needed
-4. Restart Devin to load the new configurations
+6. **Privacy First**: Project-specific knowledge stays in your local configuration
 
 ## Documentation
 
-- `agent-architecture.md`: Detailed architecture diagram and workflow patterns
-- `CRITICAL_LESSONS.md`: Important lessons and best practices
-- `DEVELOPMENT_GUIDE.md`: Development guidelines and workflows
+- [CUSTOMIZATION.md](CUSTOMIZATION.md): How to customize templates for your project
+- [patterns/coordinator-workflows.md](patterns/coordinator-workflows.md): Coordinator delegation patterns
+- [patterns/streamlit-performance.md](patterns/streamlit-performance.md): Streamlit optimization patterns
+- [documentation/agent-architecture.md](documentation/agent-architecture.md): Detailed architecture documentation
+- [documentation/CRITICAL_LESSONS.md](documentation/CRITICAL_LESSONS.md): Important lessons learned
+- [documentation/DEVELOPMENT_GUIDE.md](documentation/DEVELOPMENT_GUIDE.md): Development guidelines
 
 ## Contributing
 
-When adding new agents or skills:
-1. Create the agent/skill directory following the existing structure
-2. Add appropriate documentation in the `AGENT.md` or `SKILL.md` file
-3. Update `agent-architecture.md` if the architecture changes
-4. Update `config.json` with necessary permissions
-5. Test the configuration before committing
+When contributing new templates or patterns:
+
+1. Keep them **generic and reusable** across projects
+2. Remove any **project-specific information** (paths, configs, business logic)
+3. Add **clear documentation** for customization
+4. Update relevant documentation files
+5. Test the template before submitting
+
+## Privacy & Security
+
+This repository contains **only generic templates and patterns**.
+
+**What IS shared:**
+- Generic agent configurations
+- Reusable patterns and workflows
+- Best practices and guidelines
+- Documentation and examples
+
+**What is NOT shared:**
+- Project-specific file paths
+- Business logic details
+- Proprietary algorithms
+- Internal architecture diagrams
+- Configuration values (API keys, secrets)
+- Custom agent implementations
+
+Keep your project-specific customizations in your local `~/.config/devin/agents/` directory - these should never be committed to this repository.
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+For issues or questions:
+1. Check the documentation in the `documentation/` directory
+2. Review [CUSTOMIZATION.md](CUSTOMIZATION.md) for guidance
+3. Open an issue on GitHub for template-specific problems
