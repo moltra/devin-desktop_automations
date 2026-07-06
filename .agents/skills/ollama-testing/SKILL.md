@@ -13,6 +13,7 @@ permissions:
     - Exec(true)
     - Exec(/bin/true)
     - Exec(/usr/bin/true)
+    - Exec(cp *)
     - Exec(git log*)
     - Exec(git show*)
     - Exec(git status*)

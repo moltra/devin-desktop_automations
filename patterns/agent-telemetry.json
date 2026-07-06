@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AgentTelemetry",
+  "description": "Structured telemetry record for a single subagent task. Each subagent emits one record per task with start/end times, tool calls, and permission requests.",
+  "type": "object",
+  "required": [
+    "agent_name",
+    "task_id",
+    "task_summary",
+    "start_time",
+    "end_time",
+    "tool_calls",
+    "permission_requests",
+    "final_status"
+  ],
+  "properties": {
+    "agent_name": {
+      "type": "string",
+      "description": "Name of the subagent profile as defined in the template frontmatter."
+    },
+    "task_id": {
+      "type": "string",
+      "description": "Unique identifier for this task instance."
+    },
+    "parent_task_id": {
+      "type": "string",
+      "description": "Task ID of the parent coordinator task, if applicable."
+    },
+    "task_summary": {
+      "type": "string",
+      "description": "One-line summary of what the task asked the agent to do."
+    },
+    "start_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp recorded before any work begins."
+    },
+    "end_time": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp recorded after the final handoff. Null until the task ends."
+    },
+    "tool_calls": {
+      "type": "array",
+      "description": "Chronological log of every tool call made during the task.",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "tool", "status"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tool": {
+            "type": "string",
+            "enum": [
+              "read",
+              "write",
+              "edit",
+              "exec",
+              "grep",
+              "glob",
+              "find_file_by_name",
+              "run_subagent",
+              "read_subagent",
+              "ask_user_question",
+              "mcp_call_tool"
+            ]
+          },
+          "command": {
+            "type": ["string", "null"],
+            "description": "Exact command executed (for exec) or file path (for read/write/edit). Null for other tools."
+          },
+          "purpose": {
+            "type": "string",
+            "description": "One-sentence explanation of why the tool was called."
+          },
+          "status": {
+            "type": "string",
+            "enum": ["success", "failure", "blocked", "pending_approval"]
+          },
+          "tokens_input": {
+            "type": ["integer", "null"],
+            "description": "Input tokens consumed by the tool call, if the runtime provides it."
+          },
+          "tokens_output": {
+            "type": ["integer", "null"],
+            "description": "Output tokens produced by the tool call, if the runtime provides it."
+          },
+          "tokens_total": {
+            "type": ["integer", "null"],
+            "description": "Total tokens consumed by the tool call, if the runtime provides it."
+          },
+          "permission_required": {
+            "type": "boolean",
+            "description": "True if the tool call required user approval before running."
+          },
+          "permission_outcome": {
+            "type": "string",
+            "enum": ["approved", "denied", "escalated", "not_required"]
+          }
+        }
+      }
+    },
+    "permission_requests": {
+      "type": "array",
+      "description": "Log of every permission request or blocked tool call, even if it was also recorded in tool_calls.",
+      "items": {
+        "type": "object",
+        "required": ["timestamp", "tool", "reason"],
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tool": {
+            "type": "string",
+            "description": "Tool or command that required permission."
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why the tool was needed and what the agent was trying to accomplish."
+          },
+          "outcome": {
+            "type": "string",
+            "enum": ["approved", "denied", "escalated", "pending"]
+          }
+        }
+      }
+    },
+    "final_status": {
+      "type": "string",
+      "enum": ["complete", "blocked", "failed", "escalated"],
+      "description": "Overall outcome of the task."
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional human-readable summary, blockers, or permission gaps to fix."
+    }
+  }
+}
