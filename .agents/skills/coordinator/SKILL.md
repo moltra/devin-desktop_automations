@@ -6,6 +6,18 @@ agent: coordinator
 triggers:
   - user
   - model
+allowed-tools:
+  - read
+  - grep
+  - glob
+  - exec
+  - run_subagent
+  - read_subagent
+permissions:
+  allow:
+    - Exec(true)
+    - Exec(/bin/true)
+    - Exec(/usr/bin/true)
 ---
 
 You are the coordinator. Break down the complex task and delegate to appropriate specialists.

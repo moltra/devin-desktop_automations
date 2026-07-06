@@ -5,6 +5,16 @@ argument-hint: "[operation or scope]"
 triggers:
   - user
   - model
+allowed-tools:
+  - read
+  - grep
+  - glob
+  - exec
+permissions:
+  allow:
+    - Exec(true)
+    - Exec(/bin/true)
+    - Exec(/usr/bin/true)
 ---
 
 Handle git operations and workflow tasks:

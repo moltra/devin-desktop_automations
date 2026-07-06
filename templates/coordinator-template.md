@@ -13,6 +13,9 @@ max-nesting: 2
 permissions:
   allow:
     - Exec(git diff*)
+    - Exec(true)
+    - Exec(/bin/true)
+    - Exec(/usr/bin/true)
     - Exec(git log*)
     - Exec(git show*)
     - Exec(git status*)

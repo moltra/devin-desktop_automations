@@ -5,6 +5,16 @@ argument-hint: "[files or scope]"
 triggers:
   - user
   - model
+allowed-tools:
+  - read
+  - grep
+  - glob
+  - exec
+permissions:
+  allow:
+    - Exec(true)
+    - Exec(/bin/true)
+    - Exec(/usr/bin/true)
 ---
 
 Perform a rigorous Python code review focusing on:

@@ -12,6 +12,9 @@ allowed-tools:
 permissions:
   allow:
     - Exec(git *)
+    - Exec(true)
+    - Exec(/bin/true)
+    - Exec(/usr/bin/true)
   deny:
     - Exec(git push)
     - Exec(git remote*)
