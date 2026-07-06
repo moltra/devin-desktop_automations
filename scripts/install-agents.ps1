@@ -1,18 +1,30 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Install or update Devin agent templates and skills to the local Devin configuration.
+    Install or update Devin agent templates and skills.
 
 .DESCRIPTION
-    Detects the Devin configuration directory on Windows (%APPDATA%\devin), then
-    installs agent templates as named AGENT.md profiles and copies skills from both
+    Asks whether to install locally (current project: .\.devin) or globally (user
+    Devin config: %APPDATA%\devin). On non-interactive terminals it defaults to
+    global.
+
+    Installs agent templates as named AGENT.md profiles and copies skills from both
     .agents/skills and .devin/skills. Existing files are backed up before overwriting.
 
     If the script is not run from inside the repository, it clones the repository to
     a temporary directory automatically.
 
 .PARAMETER DevinConfig
-    Override the target Devin configuration directory.
+    Override the target Devin configuration directory. Skips the local/global prompt.
+
+.PARAMETER Local
+    Install into the current project directory (.\devin).
+
+.PARAMETER Global
+    Install into the user Devin configuration directory.
+
+.PARAMETER InstallMode
+    Explicitly set the scope to local or global (alternative to -Local/-Global).
 
 .PARAMETER RepoUrl
     Git repository URL to clone when running standalone.
@@ -24,6 +36,12 @@
     .\scripts\install-agents.ps1
 
 .EXAMPLE
+    .\scripts\install-agents.ps1 -Local
+
+.EXAMPLE
+    .\scripts\install-agents.ps1 -Global
+
+.EXAMPLE
     .\scripts\install-agents.ps1 -DevinConfig "C:\Users\Me\AppData\Roaming\devin"
 
 .EXAMPLE
@@ -32,6 +50,9 @@
 [CmdletBinding()]
 param(
     [string]$DevinConfig = "",
+    [switch]$Local,
+    [switch]$Global,
+    [string]$InstallMode = "",
     [string]$RepoUrl = "https://github.com/moltra/devin-desktop_automations.git",
     [string]$RepoBranch = "master"
 )
@@ -65,10 +86,48 @@ function Locate-Repo {
     return $tmpDir
 }
 
+function Select-InstallScope {
+    if ($DevinConfig) {
+        return "global"
+    }
+
+    if ($Local) {
+        return "local"
+    }
+
+    if ($Global) {
+        return "global"
+    }
+
+    if ($InstallMode) {
+        $mode = $InstallMode.ToLower()
+        if ($mode -ne "local" -and $mode -ne "global") {
+            throw "Invalid InstallMode: $InstallMode. Must be local or global."
+        }
+        return $mode
+    }
+
+    if ($Host.UI.RawUI -and [Environment]::UserInteractive) {
+        $prompt = "Install locally (current project: $PWD\.devin) or globally (user config)? [local/global]"
+        $response = Read-Host $prompt
+        $mode = $response.ToLower()
+        if ($mode -ne "local" -and $mode -ne "global") {
+            Write-Host "Invalid choice: $response. Defaulting to global."
+            $mode = "global"
+        }
+        return $mode
+    }
+
+    return "global"
+}
+
 $repoDir = Locate-Repo
+$scope = Select-InstallScope
 
 if ($DevinConfig) {
     $devinConfig = $DevinConfig
+} elseif ($scope -eq "local") {
+    $devinConfig = Join-Path $PWD "devin"
 } else {
     $devinConfig = Join-Path $env:APPDATA "devin"
 }
@@ -78,6 +137,7 @@ $agentsDir = Join-Path $devinConfig "agents"
 $skillsDir = Join-Path $devinConfig "skills"
 
 Write-Host "Installing Devin agents and skills..."
+Write-Host "Scope:      $scope"
 Write-Host "Repository: $repoDir"
 Write-Host "Target:     $devinConfig"
 

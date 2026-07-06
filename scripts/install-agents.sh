@@ -1,5 +1,5 @@
 #!/bin/bash
-# Install or update Devin agent templates and skills to the local Devin configuration.
+# Install or update Devin agent templates and skills.
 #
 # Usage:
 #   Run from inside the repository:
@@ -8,12 +8,16 @@
 #   Run standalone (downloads the repository automatically):
 #     bash <(curl -fsSL https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.sh)
 #
-# The script detects the Devin configuration directory based on the operating system:
-#   - Linux/macOS: ~/.config/devin
-#   - Windows (Git Bash/MSYS/Cygwin): $HOME/AppData/Roaming/devin
+#   Force a specific scope without prompting:
+#     INSTALL_MODE=local  bash scripts/install-agents.sh
+#     INSTALL_MODE=global bash scripts/install-agents.sh
+#
+# The script asks whether to install locally (current project: ./.devin) or globally
+# (user Devin config). On non-interactive terminals it defaults to global.
 #
 # Override behavior by setting these environment variables:
-#   - DEVIN_CONFIG: target Devin configuration directory
+#   - DEVIN_CONFIG: target directory (skips the local/global prompt)
+#   - INSTALL_MODE: local or global (skips the prompt)
 #   - REPO_URL:     Git repository URL to clone when running standalone
 #   - REPO_BRANCH:  Git branch to clone when running standalone (default: master)
 
@@ -25,13 +29,8 @@ REPO_URL="${REPO_URL:-https://github.com/moltra/devin-desktop_automations.git}"
 REPO_BRANCH="${REPO_BRANCH:-master}"
 TMP_REPO_DIR=""
 
-# Detect Devin configuration directory.
-detect_devin_config() {
-    if [ -n "${DEVIN_CONFIG:-}" ]; then
-        printf '%s' "$DEVIN_CONFIG"
-        return
-    fi
-
+# Detect global Devin configuration directory.
+detect_global_config() {
     local os
     os=$(uname -s)
 
@@ -49,6 +48,42 @@ detect_devin_config() {
             printf '%s/.config/devin' "$HOME"
             ;;
     esac
+}
+
+# Select installation scope: local (current project) or global (user config).
+select_install_scope() {
+    if [ -n "${DEVIN_CONFIG:-}" ]; then
+        printf 'global
+'
+        return
+    fi
+
+    if [ -n "${INSTALL_MODE:-}" ]; then
+        local mode
+        mode=$(printf '%s' "$INSTALL_MODE" | tr '[:upper:]' '[:lower:]')
+        if [ "$mode" != "local" ] && [ "$mode" != "global" ]; then
+            printf 'Invalid INSTALL_MODE: %s. Must be local or global.\n' "$INSTALL_MODE" >&2
+            exit 1
+        fi
+        printf '%s
+' "$mode"
+        return
+    fi
+
+    if [ -t 0 ] && [ -t 1 ]; then
+        local mode
+        read -rp "Install locally (current project: $PWD/.devin) or globally (user config)? [local/global]: " mode
+        mode=$(printf '%s' "$mode" | tr '[:upper:]' '[:lower:]')
+        if [ "$mode" != "local" ] && [ "$mode" != "global" ]; then
+            printf 'Invalid choice: %s. Defaulting to global.\n' "$mode" >&2
+            mode="global"
+        fi
+        printf '%s
+' "$mode"
+    else
+        printf 'global
+'
+    fi
 }
 
 # Locate the repository. If the script is not inside the repository, clone it to
@@ -86,7 +121,16 @@ cleanup() {
 }
 trap cleanup EXIT
 
-DEVIN_CONFIG=$(detect_devin_config)
+SCOPE=$(select_install_scope)
+if [ -n "${DEVIN_CONFIG:-}" ]; then
+    # A specific target was provided; keep it and skip scope-based path selection.
+    :
+elif [ "$SCOPE" = "local" ]; then
+    DEVIN_CONFIG="$PWD/.devin"
+else
+    DEVIN_CONFIG=$(detect_global_config)
+fi
+
 REPO_DIR=$(locate_repo)
 
 BACKUP_DIR="$DEVIN_CONFIG/backup-$(date +%Y%m%d-%H%M%S)"
@@ -94,6 +138,7 @@ AGENTS_DIR="$DEVIN_CONFIG/agents"
 SKILLS_DIR="$DEVIN_CONFIG/skills"
 
 printf 'Installing Devin agents and skills...\n'
+printf 'Scope:      %s\n' "$SCOPE"
 printf 'Repository: %s\n' "$REPO_DIR"
 printf 'Target:     %s\n' "$DEVIN_CONFIG"
 

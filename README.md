@@ -132,11 +132,29 @@ irm https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/sc
    .\scripts\install-agents.ps1
    ```
 
-The installer detects the Devin configuration directory, backs up any existing
-agents and skills, then installs the latest templates and skills.
+The installer asks whether to install **locally** (current project: `./.devin`) or
+**globally** (user Devin config: `~/.config/devin/` or `%APPDATA%\devin\`). On
+non-interactive terminals it defaults to global.
+
+Skip the prompt by passing the scope explicitly:
+
+**Linux / macOS / Git Bash:**
+```bash
+bash scripts/install-agents.sh          # prompts for local/global
+INSTALL_MODE=local bash scripts/install-agents.sh
+INSTALL_MODE=global bash scripts/install-agents.sh
+```
+
+**Windows PowerShell:**
+```powershell
+.\scripts\install-agents.ps1            # prompts for local/global
+.\scripts\install-agents.ps1 -Local
+.\scripts\install-agents.ps1 -Global
+```
 
 3. **Customize for your project:**
-   - Edit agent configurations in `~/.config/devin/agents/` (Linux/macOS) or `%APPDATA%\devin\agents\` (Windows)
+   - For **global** installs, edit agent configurations in `~/.config/devin/agents/` (Linux/macOS) or `%APPDATA%\devin\agents\` (Windows)
+   - For **local** installs, edit agent configurations in `./.devin/agents/`
    - Add project-specific patterns and knowledge
    - Adjust permissions and tool access
    - Update model assignments if needed
