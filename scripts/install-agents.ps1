@@ -8,24 +8,64 @@
     installs agent templates as named AGENT.md profiles and copies skills from both
     .agents/skills and .devin/skills. Existing files are backed up before overwriting.
 
+    If the script is not run from inside the repository, it clones the repository to
+    a temporary directory automatically.
+
 .PARAMETER DevinConfig
     Override the target Devin configuration directory.
+
+.PARAMETER RepoUrl
+    Git repository URL to clone when running standalone.
+
+.PARAMETER RepoBranch
+    Git branch to clone when running standalone.
 
 .EXAMPLE
     .\scripts\install-agents.ps1
 
 .EXAMPLE
     .\scripts\install-agents.ps1 -DevinConfig "C:\Users\Me\AppData\Roaming\devin"
+
+.EXAMPLE
+    irm https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.ps1 | iex
 #>
 [CmdletBinding()]
 param(
-    [string]$DevinConfig = ""
+    [string]$DevinConfig = "",
+    [string]$RepoUrl = "https://github.com/moltra/devin-desktop_automations.git",
+    [string]$RepoBranch = "master"
 )
 
 $ErrorActionPreference = "Stop"
 
-$scriptDir = Split-Path -Parent $PSCommandPath
-$repoDir = Split-Path -Parent $scriptDir
+$tmpRepoDir = $null
+
+function Locate-Repo {
+    $scriptDir = $null
+    if ($PSCommandPath) {
+        $scriptDir = Split-Path -Parent $PSCommandPath
+    }
+
+    if ($scriptDir) {
+        $candidate = Split-Path -Parent $scriptDir
+        if ((Test-Path (Join-Path $candidate "templates")) -and
+            (Test-Path (Join-Path (Join-Path $candidate ".agents") "skills"))) {
+            return $candidate
+        }
+    }
+
+    if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+        throw "git is not installed and the repository is not available locally."
+    }
+
+    $tmpDir = Join-Path $env:TEMP ("devin-automations-" + (Get-Random))
+    Write-Host "Repository not found locally. Cloning to $tmpDir..."
+    git clone --depth 1 --branch $RepoBranch $RepoUrl $tmpDir | Out-Null
+    $script:tmpRepoDir = $tmpDir
+    return $tmpDir
+}
+
+$repoDir = Locate-Repo
 
 if ($DevinConfig) {
     $devinConfig = $DevinConfig
@@ -107,3 +147,7 @@ Write-Host "Backup: $backupDir"
 Write-Host "`nNext steps:"
 Write-Host "1. Review backed-up files if you had customizations."
 Write-Host "2. Restart Devin to load the updated configurations."
+
+if ($tmpRepoDir -and (Test-Path $tmpRepoDir)) {
+    Remove-Item -Path $tmpRepoDir -Recurse -Force
+}

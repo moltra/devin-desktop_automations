@@ -98,6 +98,22 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 
 ### Quick Start
 
+#### Option A: Run the installer without cloning (standalone)
+
+The installer can download the repository automatically if it is not already present.
+
+**Linux / macOS / Git Bash on Windows:**
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.sh)
+```
+
+**Windows PowerShell:**
+```powershell
+irm https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.ps1 | iex
+```
+
+#### Option B: Clone first, then install
+
 1. **Clone this repository:**
    ```bash
    git clone https://github.com/moltra/devin-desktop_automations.git
@@ -116,8 +132,8 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
    .\scripts\install-agents.ps1
    ```
 
-   The installer detects the Devin configuration directory, backs up any existing
-   agents and skills, then installs the latest templates and skills.
+The installer detects the Devin configuration directory, backs up any existing
+agents and skills, then installs the latest templates and skills.
 
 3. **Customize for your project:**
    - Edit agent configurations in `~/.config/devin/agents/` (Linux/macOS) or `%APPDATA%\devin\agents\` (Windows)

@@ -1,17 +1,29 @@
 #!/bin/bash
 # Install or update Devin agent templates and skills to the local Devin configuration.
 #
-# Usage: bash scripts/install-agents.sh
+# Usage:
+#   Run from inside the repository:
+#     bash scripts/install-agents.sh
+#
+#   Run standalone (downloads the repository automatically):
+#     bash <(curl -fsSL https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.sh)
 #
 # The script detects the Devin configuration directory based on the operating system:
 #   - Linux/macOS: ~/.config/devin
 #   - Windows (Git Bash/MSYS/Cygwin): $HOME/AppData/Roaming/devin
 #
-# Override the target directory by setting the DEVIN_CONFIG environment variable.
+# Override behavior by setting these environment variables:
+#   - DEVIN_CONFIG: target Devin configuration directory
+#   - REPO_URL:     Git repository URL to clone when running standalone
+#   - REPO_BRANCH:  Git branch to clone when running standalone (default: master)
 
 set -euo pipefail
 
 shopt -s nullglob
+
+REPO_URL="${REPO_URL:-https://github.com/moltra/devin-desktop_automations.git}"
+REPO_BRANCH="${REPO_BRANCH:-master}"
+TMP_REPO_DIR=""
 
 # Detect Devin configuration directory.
 detect_devin_config() {
@@ -39,9 +51,43 @@ detect_devin_config() {
     esac
 }
 
+# Locate the repository. If the script is not inside the repository, clone it to
+# a temporary directory.
+locate_repo() {
+    local script_dir
+    script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd 2>/dev/null) || script_dir=""
+
+    if [ -n "$script_dir" ] && [ -d "$script_dir" ]; then
+        local candidate
+        candidate=$(dirname "$script_dir")
+        if [ -d "$candidate/templates" ] && [ -d "$candidate/.agents/skills" ]; then
+            printf '%s' "$candidate"
+            return
+        fi
+    fi
+
+    if ! command -v git >/dev/null 2>&1; then
+        printf 'Error: git is not installed and the repository is not available locally.\n' >&2
+        exit 1
+    fi
+
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+    TMP_REPO_DIR="$tmp_dir"
+    printf 'Repository not found locally. Cloning to %s...\n' "$tmp_dir" >&2
+    git clone --depth 1 --branch "$REPO_BRANCH" "$REPO_URL" "$tmp_dir" >&2
+    printf '%s' "$tmp_dir"
+}
+
+cleanup() {
+    if [ -n "${TMP_REPO_DIR:-}" ] && [ -d "$TMP_REPO_DIR" ]; then
+        rm -rf "$TMP_REPO_DIR"
+    fi
+}
+trap cleanup EXIT
+
 DEVIN_CONFIG=$(detect_devin_config)
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-REPO_DIR=$(dirname "$SCRIPT_DIR")
+REPO_DIR=$(locate_repo)
 
 BACKUP_DIR="$DEVIN_CONFIG/backup-$(date +%Y%m%d-%H%M%S)"
 AGENTS_DIR="$DEVIN_CONFIG/agents"
