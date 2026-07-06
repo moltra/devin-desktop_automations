@@ -68,13 +68,27 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 │       ├── ollama-testing/
 │       ├── quick-review/
 │       └── redis-resilience/
+├── .devin/                    # Devin-native skills
+│   └── skills/
+│       ├── coordinator/
+│       ├── git-workflow/
+│       ├── python-reviewer/
+│       ├── redis-engineer/
+│       ├── security-auditor/
+│       ├── streamlit-expert/
+│       └── testing-guardian/
 ├── documentation/             # Documentation
 │   ├── agent-architecture.md
 │   ├── CRITICAL_LESSONS.md
 │   ├── DEVELOPMENT_GUIDE.md
 │   └── CREATING_AGENTS.md
+├── patterns/                  # Reusable patterns
+│   ├── agent-telemetry.json   # Telemetry JSON schema
+│   ├── agent-telemetry.md   # Telemetry agent instructions
+│   └── ...
 ├── scripts/                   # Utility scripts
-│   ├── install-agents.sh
+│   ├── install-agents.sh     # Unix / Git Bash installer
+│   ├── install-agents.ps1    # Windows PowerShell installer
 │   └── validate-agent.sh
 ├── CUSTOMIZATION.md           # How to customize templates
 └── README.md                 # This file
@@ -90,13 +104,23 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
    cd devin-desktop_automations
    ```
 
-2. **Install templates to your local Devin config:**
+2. **Install or update templates and skills:**
+
+   **Linux / macOS / Git Bash on Windows:**
    ```bash
    bash scripts/install-agents.sh
    ```
 
+   **Windows PowerShell:**
+   ```powershell
+   .\scripts\install-agents.ps1
+   ```
+
+   The installer detects the Devin configuration directory, backs up any existing
+   agents and skills, then installs the latest templates and skills.
+
 3. **Customize for your project:**
-   - Edit agent configurations in `~/.config/devin/agents/`
+   - Edit agent configurations in `~/.config/devin/agents/` (Linux/macOS) or `%APPDATA%\devin\agents\` (Windows)
    - Add project-specific patterns and knowledge
    - Adjust permissions and tool access
    - Update model assignments if needed
@@ -105,20 +129,30 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 
 ### Manual Installation
 
-If you prefer manual installation:
+If you prefer manual installation, place each agent template in its own directory
+with the file named `AGENT.md`, and copy each skill directory into the skills folder:
 
 ```bash
-# Copy agent templates
-cp -r templates/* ~/.config/devin/agents/
+# Linux / macOS example
+mkdir -p ~/.config/devin/agents/coordinator
+mkdir -p ~/.config/devin/agents/python-reviewer
+# ... one directory per agent
 
-# Copy skills (using .agents standard for broad compatibility)
+cp templates/coordinator-template.md ~/.config/devin/agents/coordinator/AGENT.md
+cp templates/python-reviewer-template.md ~/.config/devin/agents/python-reviewer/AGENT.md
+
+# Copy skills from both .agents and .devin standards
 cp -r .agents/skills/* ~/.config/devin/skills/
+cp -r .devin/skills/* ~/.config/devin/skills/
 
 # Make scripts executable
 chmod +x scripts/*.sh
 ```
 
-**Note:** Skills are stored in `.agents/skills/` following the `.agents` skills standard for broad compatibility with third-party tools.
+**Note:** Agents are installed as `AGENT.md` files inside named directories (e.g.,
+`agents/coordinator/AGENT.md`). Skills are stored in `.agents/skills/` and
+`.devin/skills/` following the `.agents` and `.devin` skills standards for broad
+compatibility with third-party tools.
 
 ## Customization
 
