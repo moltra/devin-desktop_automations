@@ -6,6 +6,10 @@ A comprehensive collection of **generic agent templates and patterns** for Devin
 
 This repository contains **generic agent templates, patterns, and documentation** that can be customized for any project. The templates are designed to be copied to your local Devin configuration and then adapted to your specific needs.
 
+### Current Setup
+
+**Moltra is currently using the setup in the `Current_setup_in_use_by Moltra/` folder.** This folder contains the active configuration and customizations being used in production.
+
 ## Architecture
 
 The system uses a hierarchical delegation pattern where a coordinator agent orchestrates specialized sub-agents for specific tasks.
@@ -68,27 +72,13 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 │       ├── ollama-testing/
 │       ├── quick-review/
 │       └── redis-resilience/
-├── .devin/                    # Devin-native skills
-│   └── skills/
-│       ├── coordinator/
-│       ├── git-workflow/
-│       ├── python-reviewer/
-│       ├── redis-engineer/
-│       ├── security-auditor/
-│       ├── streamlit-expert/
-│       └── testing-guardian/
 ├── documentation/             # Documentation
 │   ├── agent-architecture.md
 │   ├── CRITICAL_LESSONS.md
 │   ├── DEVELOPMENT_GUIDE.md
 │   └── CREATING_AGENTS.md
-├── patterns/                  # Reusable patterns
-│   ├── agent-telemetry.json   # Telemetry JSON schema
-│   ├── agent-telemetry.md   # Telemetry agent instructions
-│   └── ...
 ├── scripts/                   # Utility scripts
-│   ├── install-agents.sh     # Unix / Git Bash installer
-│   ├── install-agents.ps1    # Windows PowerShell installer
+│   ├── install-agents.sh
 │   └── validate-agent.sh
 ├── CUSTOMIZATION.md           # How to customize templates
 └── README.md                 # This file
@@ -98,63 +88,19 @@ The system uses a hierarchical delegation pattern where a coordinator agent orch
 
 ### Quick Start
 
-#### Option A: Run the installer without cloning (standalone)
-
-The installer can download the repository automatically if it is not already present.
-
-**Linux / macOS / Git Bash on Windows:**
-```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.sh)
-```
-
-**Windows PowerShell:**
-```powershell
-irm https://raw.githubusercontent.com/moltra/devin-desktop_automations/master/scripts/install-agents.ps1 | iex
-```
-
-#### Option B: Clone first, then install
-
 1. **Clone this repository:**
    ```bash
    git clone https://github.com/moltra/devin-desktop_automations.git
    cd devin-desktop_automations
    ```
 
-2. **Install or update templates and skills:**
-
-   **Linux / macOS / Git Bash on Windows:**
+2. **Install templates to your local Devin config:**
    ```bash
    bash scripts/install-agents.sh
    ```
 
-   **Windows PowerShell:**
-   ```powershell
-   .\scripts\install-agents.ps1
-   ```
-
-The installer asks whether to install **locally** (current project: `./.devin`) or
-**globally** (user Devin config: `~/.config/devin/` or `%APPDATA%\devin\`). On
-non-interactive terminals it defaults to global.
-
-Skip the prompt by passing the scope explicitly:
-
-**Linux / macOS / Git Bash:**
-```bash
-bash scripts/install-agents.sh          # prompts for local/global
-INSTALL_MODE=local bash scripts/install-agents.sh
-INSTALL_MODE=global bash scripts/install-agents.sh
-```
-
-**Windows PowerShell:**
-```powershell
-.\scripts\install-agents.ps1            # prompts for local/global
-.\scripts\install-agents.ps1 -Local
-.\scripts\install-agents.ps1 -Global
-```
-
 3. **Customize for your project:**
-   - For **global** installs, edit agent configurations in `~/.config/devin/agents/` (Linux/macOS) or `%APPDATA%\devin\agents\` (Windows)
-   - For **local** installs, edit agent configurations in `./.devin/agents/`
+   - Edit agent configurations in `~/.config/devin/agents/`
    - Add project-specific patterns and knowledge
    - Adjust permissions and tool access
    - Update model assignments if needed
@@ -163,30 +109,23 @@ INSTALL_MODE=global bash scripts/install-agents.sh
 
 ### Manual Installation
 
-If you prefer manual installation, place each agent template in its own directory
-with the file named `AGENT.md`, and copy each skill directory into the skills folder:
+If you prefer manual installation:
 
 ```bash
-# Linux / macOS example
-mkdir -p ~/.config/devin/agents/coordinator
-mkdir -p ~/.config/devin/agents/python-reviewer
-# ... one directory per agent
+# Copy agent templates
+cp -r templates/* ~/.config/devin/agents/
 
-cp templates/coordinator-template.md ~/.config/devin/agents/coordinator/AGENT.md
-cp templates/python-reviewer-template.md ~/.config/devin/agents/python-reviewer/AGENT.md
-
-# Copy skills from both .agents and .devin standards
+# Copy skills (using .agents standard for broad compatibility)
 cp -r .agents/skills/* ~/.config/devin/skills/
-cp -r .devin/skills/* ~/.config/devin/skills/
+
+# Copy legacy skills if present
+cp -r skills/* ~/.config/devin/skills/ 2>/dev/null || true
 
 # Make scripts executable
 chmod +x scripts/*.sh
 ```
 
-**Note:** Agents are installed as `AGENT.md` files inside named directories (e.g.,
-`agents/coordinator/AGENT.md`). Skills are stored in `.agents/skills/` and
-`.devin/skills/` following the `.agents` and `.devin` skills standards for broad
-compatibility with third-party tools.
+**Note:** Skills are stored in `.agents/skills/` following the `.agents` skills standard for broad compatibility with third-party tools. Legacy skills in `skills/` are also supported for backward compatibility.
 
 ## Customization
 
